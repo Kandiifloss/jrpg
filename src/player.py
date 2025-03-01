@@ -109,16 +109,26 @@ class Sword(pygame.sprite.Sprite):
 
 
 class EnemyHp(pygame.sprite.Sprite):
-    def __init__(self, enemy, groups):
+    def __init__(self, groups, hp, rect):
         super().__init__(groups)
+        self.hp = self.max_hp = hp
         self.font = pygame.font.Font(None, 30)
-        self.image = self.font.render(str(enemy.hp) + "/10", 1, 'black')
-        self.enemy = enemy
-        self.rect = enemy.image.get_rect(center = (enemy.rect.x, enemy.rect.y - 10))
+        #self.reduce(0)
+        #self.rect = rect
+        #self.rect.center = (rect.centerx, rect.centery - 10)
+        self.rect = rect
+        self.image = self.font.render(f"{self.hp}/{self.max_hp}", 1, 'black')
 
-    def update(self, dt):
-        self.rect = self.enemy.image.get_rect(center = (self.enemy.rect.x, self.enemy.rect.y - 10))
-        self.image = self.font.render(str(self.enemy.hp) + "/10", 1, 'black')
+    def reduce(self, dmg):
+        self.hp = self.hp - dmg
+        self.image = self.font.render(f"{self.hp}/{self.max_hp}", 1, 'black')
+        #self.image = self.font.render(str(enemy.hp) + "/10", 1, 'black')
+        #self.enemy = enemy
+        #self.rect = enemy.image.get_rect(center = (enemy.rect.x, enemy.rect.y - 10))
+
+    #def update(self):
+        #self.rect = self.enemy.image.get_rect(center = (self.enemy.rect.x, self.enemy.rect.y - 10))
+        #self.image = self.font.render(str(self.enemy.hp) + "/10", 1, 'black')
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -128,7 +138,8 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center = pos)
         self.type = 'enemy'
         self.player = player
-        self.hp = 10
+        #self.hp = 10
+        self.hp_label = EnemyHp(groups[0], 10, self.image.get_rect(center = (self.rect.x, self.rect.y - 10)))
 
         self.speed = 100
         self.collision_obj = player.collision_obj
@@ -141,16 +152,18 @@ class Enemy(pygame.sprite.Sprite):
 
     def collision(self, direction):
         for obj in self.collision_obj:
-            if self.rect.colliderect(obj.rect) and obj != self:
+            if self.rect.colliderect(obj.rect) and obj != self: #второе условие?
                 if direction == 'horizontal':
                     if self.direction.x + self.acceleration.x > 0: self.rect.right = obj.rect.left                    
                     if self.direction.x + self.acceleration.x < 0: self.rect.left = obj.rect.right
                 elif direction == 'vertical':
                     if self.direction.y + self.acceleration.y < 0: self.rect.top = obj.rect.bottom
                     if self.direction.y + self.acceleration.y > 0: self.rect.bottom = obj.rect.top
+                self.hp_label.rect.center = (self.rect.centerx, self.rect.centery - 10)
+                #ht_label.rect = image.get_rect(center = (rect.x, rect.y - 10))
 
     def input(self):
-        if self.player.hp >0:
+        if self.player.hp > 0:
             self.direction.x = self.player.rect.x - self.rect.x
             self.direction.y = self.player.rect.y - self.rect.y
             self.direction = self.direction.normalize() if self.direction else self.direction
@@ -172,10 +185,12 @@ class Enemy(pygame.sprite.Sprite):
             self.direction.y = 0
 
     def move(self, dt):
+        diff_x = self.direction.x * self.speed * dt + self.acceleration.x
+        diff_y = self.direction.y * self.speed * dt + self.acceleration.y
+        self.rect.move(diff_x, diff_y)
+        self.hp_label.rect.move(diff_x, diff_y)
         self.acceleration_update()
-        self.rect.x += self.direction.x * self.speed * dt + self.acceleration.x
         self.collision('horizontal')
-        self.rect.y += self.direction.y * self.speed * dt + self.acceleration.y
         self.collision('vertical')
 
     def update(self, dt):

@@ -22,3 +22,8 @@ class EnemySprites(pygame.sprite.Group):
         for enemy in enemies:
             enemy.player = player
 
+
+class EnemySprite(pygame.sprite.Group):
+    def __init__(self, enemy, hp):
+        super().__init__([enemy, hp])
+

@@ -24,7 +24,7 @@ class Game:
         self.setup()
 
         self.player = player.Player((200, 200), self.all_sprites, self.collision_sprites, self.create_hit, self.delete_hit)
-        self.enemy = []
+        self.enemies = []
         self.enemyHp = []
 
     def UI(self):
@@ -57,15 +57,15 @@ class Game:
                 self.all_sprites.remove(self.player)
                 self.player.rect
 
-            if enemy.hp <= 0:
+            if enemy.hp_label.hp <= 0:
                 self.all_sprites.remove(enemy)
                 self.collision_sprites.remove(enemy)
                 self.enemy_sprites.remove(enemy)
                 enemies.remove(enemy)
                 
             if enemy.rect.colliderect(self.hit.rect):
-                enemy.hp -= 1
-                print(enemy.hp)
+                enemy.hp_label.hp -= 1
+                print(enemy.hp_label.hp)
                 enemy.stop()
                 
     def create_hit(self, pos):          
@@ -83,20 +83,25 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
                 if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
-                    self.enemy.append(player.Enemy((mouse_x + self.player.rect.x - WINDOW_WIDTH // 2, mouse_y + self.player.rect.y - WINDOW_HEIGHT // 2), 
-                                                  (self.all_sprites, self.collision_sprites, self.enemy_sprites), self.player))
-                    self.enemyHp.append(player.EnemyHp(self.enemy[-1], self.all_sprites))
+                    #self.enemies.append(groups.EnemySprite(
+                        #player.Enemy((mouse_x + self.player.rect.x - WINDOW_WIDTH // 2, mouse_y + self.player.rect.y - WINDOW_HEIGHT // 2), 
+                        #            (self.all_sprites, self.collision_sprites, self.enemy_sprites), 
+                        #            self.player),
+                        #player.EnemyHp(self.enemies[-1], self.all_sprites)))
+                    self.enemies.append(player.Enemy((mouse_x + self.player.rect.x - WINDOW_WIDTH // 2, mouse_y + self.player.rect.y - WINDOW_HEIGHT // 2), 
+                                                    (self.all_sprites, self.collision_sprites, self.enemy_sprites), self.player))
+
                     
                 if event.type == pygame.KEYDOWN and self.player.is_died():
                     if event.key == pygame.K_r:
                         self.player = player.Player((200, 200), self.all_sprites, self.collision_sprites, self.create_hit, self.delete_hit)
                         self.player.hp = 100
                         print("Respawn")
-                        self.enemy_sprites.update(self.player, self.enemy)
+                        self.enemy_sprites.update(self.player, self.enemies)
             
             #update
             self.all_sprites.update(dt)
-            self.get_damage(self.enemy)
+            self.get_damage(self.enemies)
                     
             #draw
             self.display_surface.fill("white")
