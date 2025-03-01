@@ -25,7 +25,6 @@ class Game:
 
         self.player = player.Player((200, 200), self.all_sprites, self.collision_sprites, self.create_hit, self.delete_hit)
         self.enemy = []
-        self.enemyHp = []
 
     def UI(self):
         self.text_surface = self.font.render("HP: " + str(self.player.hp), 1, 'black')
@@ -58,14 +57,11 @@ class Game:
                 self.player.rect
 
             if enemy.hp <= 0:
-                self.all_sprites.remove(enemy)
-                self.collision_sprites.remove(enemy)
-                self.enemy_sprites.remove(enemy)
+                enemy.remove((self.all_sprites, self.collision_sprites,self.enemy_sprites))
                 enemies.remove(enemy)
                 
             if enemy.rect.colliderect(self.hit.rect):
                 enemy.hp -= 1
-                print(enemy.hp)
                 enemy.stop()
                 
     def create_hit(self, pos):          
@@ -85,7 +81,6 @@ class Game:
                 if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                     self.enemy.append(player.Enemy((mouse_x + self.player.rect.x - WINDOW_WIDTH // 2, mouse_y + self.player.rect.y - WINDOW_HEIGHT // 2), 
                                                   (self.all_sprites, self.collision_sprites, self.enemy_sprites), self.player))
-                    self.enemyHp.append(player.EnemyHp(self.enemy[-1], self.all_sprites))
                     
                 if event.type == pygame.KEYDOWN and self.player.is_died():
                     if event.key == pygame.K_r:

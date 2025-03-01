@@ -129,11 +129,19 @@ class Enemy(pygame.sprite.Sprite):
         self.type = 'enemy'
         self.player = player
         self.hp = 10
+        self.hp_surface = EnemyHp(self,groups[0])
 
         self.speed = 100
         self.collision_obj = player.collision_obj
         self.direction = player.direction
         self.acceleration = pygame.Vector2()
+
+
+    def remove(self, groups):
+        for group in groups:
+            group.remove(self)
+            group.remove(self.hp_surface)
+    
 
     def collision_with_player(self):
         if self.rect.colliderect(self.player.rect):
