@@ -1,7 +1,7 @@
 from settings import *
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, collision_sprites, create_hit, delete_hit):
+    def __init__(self, pos, groups, collision_sprites):
         super().__init__(groups)
         self.image = pygame.image.load("images/stone.png").convert_alpha()
         self.rect = self.image.get_rect(center = pos)
@@ -9,15 +9,12 @@ class Player(pygame.sprite.Sprite):
         self.collision_obj = collision_sprites
         self.type = 'player'
         
-        self.sword = 0
+        self.sword = Sword((-140, -140), groups)
 
         # cool down
         self.can_hit = True
         self.sword_timer = 0
         self.sword_cd = 400
-
-        self.create_hit = create_hit
-        self.delete_hit = delete_hit
 
         self.direction = pygame.Vector2()
         self.out_direction = pygame.Vector2()
@@ -26,14 +23,14 @@ class Player(pygame.sprite.Sprite):
         self.hp = 100
         self.attack = 0
 
-    def input(self):
+    def input(self, enemies):
         keys = pygame.key.get_pressed()
         self.direction.x = int(keys[pygame.K_d]) - int(keys[pygame.K_a])
         self.direction.y = int(keys[pygame.K_s]) - int(keys[pygame.K_w])
         self.direction = self.direction.normalize() if self.direction else self.direction
 
         if keys[pygame.K_f] and self.can_hit:
-            self.create_hit((self.hit_box.x + 5, self.hit_box.y + 5))
+            self.sword.hit(self.rect.center, enemies)
             
             self.can_hit = False
             self.hit_time = pygame.time.get_ticks()
@@ -60,7 +57,6 @@ class Player(pygame.sprite.Sprite):
     def attack_timer(self):
         if not self.can_hit:
             current_time = pygame.time.get_ticks()
-            if current_time - self.hit_time >= 1: self.delete_hit()
             if current_time - self.hit_time >= self.sword_cd:
                 self.can_hit = True
 
@@ -90,9 +86,9 @@ class Player(pygame.sprite.Sprite):
         else:
             return False
 
-    def update(self,dt):
-        self.input()
-        self.move(dt)
+    def update(self, **kwargs):
+        self.input(kwargs['enemies'])
+        self.move(kwargs['dt'])
         self.attack_timer()
 
     def draw(self):
@@ -103,10 +99,17 @@ class Sword(pygame.sprite.Sprite):
     def __init__(self, pos, groups):
         super().__init__(groups)
         self.image = pygame.Surface((200,200))
-        #self.image.fill("black")
-        self.rect = self.image.get_rect(center = pos)
+        self.rect = self.image.fill('brown')
+        self.rect.center = pos
         self.type = 'sword'
+        self.damage = 1
 
+    def hit(self, pos, enemies):
+        self.rect.center = pos 
+        for enemy in enemies:
+            if self.rect.colliderect(enemy.rect):
+                enemy.hp -= self.damage
+                enemy.stop()
 
 class EnemyHp(pygame.sprite.Sprite):
     def __init__(self, enemy, groups):
@@ -116,7 +119,7 @@ class EnemyHp(pygame.sprite.Sprite):
         self.enemy = enemy
         self.rect = enemy.image.get_rect(center = (enemy.rect.x, enemy.rect.y - 10))
 
-    def update(self, dt):
+    def update(self, **kwargs):
         self.rect = self.enemy.image.get_rect(center = (self.enemy.rect.x, self.enemy.rect.y - 10))
         self.image = self.font.render(str(self.enemy.hp) + "/10", 1, 'black')
 
@@ -186,7 +189,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y += self.direction.y * self.speed * dt + self.acceleration.y
         self.collision('vertical')
 
-    def update(self, dt):
-        self.move(dt)
+    def update(self, **kwargs):
+        self.move(kwargs['dt'])
         self.input()
 

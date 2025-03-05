@@ -15,6 +15,6 @@ class Collision(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = pos)
         self.type = 'collision'
 
-    def update(self, dt):
+    def update(self, **kwargs):
         pass
 
