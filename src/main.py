@@ -10,7 +10,7 @@ class Game:
     def __init__(self):
         pygame.init()
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-        pygame.display.set_caption("Квадралипсис")
+        pygame.display.set_caption('Квадралипсис')
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -25,9 +25,9 @@ class Game:
         self.enemies = []
 
     def UI(self):
-        self.text_surface = self.font.render("HP: " + str(self.player.hp), 1, 'black')
-        self.text_direction_x = self.font.render("DirectX" + str(self.player.direction), 1, 'black')
-        self.text_acc = self.font.render("Acc " + str(self.player.acceleration), 1, 'black')
+        self.text_surface = self.font.render(f'HP: {self.player.hp}', 1, 'black')
+        self.text_direction_x = self.font.render(f'DirectX {self.player.direction}', 1, 'black')
+        self.text_acc = self.font.render(f'Acc {self.player.acceleration}', 1, 'black')
         self.display_surface.blit(self.text_surface, (10, 10))
         self.display_surface.blit(self.text_direction_x, (10, 40))
         self.display_surface.blit(self.text_acc, (10, 70))

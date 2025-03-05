@@ -3,9 +3,9 @@ from settings import *
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, collision_sprites):
         super().__init__(groups)
-        self.image = pygame.image.load("images/stone.png").convert_alpha()
-        self.rect = self.image.get_rect(center = pos)
-        self.hit_box = self.rect.inflate(-10,-10)
+        self.image = pygame.image.load('images/stone.png').convert_alpha()
+        self.rect = self.image.get_rect(center=pos)
+        self.hit_box = self.rect.inflate(-10, -10)
         self.collision_obj = collision_sprites
         self.type = 'player'
         
@@ -60,7 +60,7 @@ class Player(pygame.sprite.Sprite):
             if current_time - self.hit_time >= self.sword_cd:
                 self.can_hit = True
 
-    def move(self,dt):
+    def move(self, dt):
         self.acceleration_update()
         
         self.hit_box.x += self.direction.x * self.speed * dt + self.acceleration.x
@@ -72,8 +72,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = self.hit_box.center
 
     def damage(self, enemy):
-        self.acceleration.x  = int(enemy.direction.x*10)
-        self.acceleration.y = int(enemy.direction.y*10)
+        self.acceleration.x  = int(enemy.direction.x * 10)
+        self.acceleration.y = int(enemy.direction.y * 10)
         self.rect.center = self.hit_box.center
         self.hp -= 10
 
@@ -91,14 +91,11 @@ class Player(pygame.sprite.Sprite):
         self.move(kwargs['dt'])
         self.attack_timer()
 
-    def draw(self):
-        pass
-
 
 class Sword(pygame.sprite.Sprite):
     def __init__(self, pos, groups):
         super().__init__(groups)
-        self.image = pygame.Surface((200,200))
+        self.image = pygame.Surface((200, 200))
         self.rect = self.image.fill('brown')
         self.rect.center = pos
         self.type = 'sword'
@@ -115,36 +112,33 @@ class EnemyHp(pygame.sprite.Sprite):
     def __init__(self, enemy, groups):
         super().__init__(groups)
         self.font = pygame.font.Font(None, 30)
-        self.image = self.font.render(str(enemy.hp) + "/10", 1, 'black')
         self.enemy = enemy
-        self.rect = enemy.image.get_rect(center = (enemy.rect.x, enemy.rect.y - 10))
 
     def update(self, **kwargs):
-        self.rect = self.enemy.image.get_rect(center = (self.enemy.rect.x, self.enemy.rect.y - 10))
-        self.image = self.font.render(str(self.enemy.hp) + "/10", 1, 'black')
+        self.rect = self.enemy.image.get_rect(center=(self.enemy.rect.x, self.enemy.rect.y - 10))
+        self.image = self.font.render(f'{self.enemy.hp}/{self.enemy.max_hp}', 1, 'black')
 
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos, groups, player):
         super().__init__(groups)
         self.image = pygame.image.load('images/grass.png').convert()
-        self.rect = self.image.get_rect(center = pos)
+        self.rect = self.image.get_rect(center=pos)
         self.type = 'enemy'
         self.player = player
+        self.max_hp = 10
         self.hp = 10
-        self.hp_surface = EnemyHp(self,groups[0])
+        self.hp_surface = EnemyHp(self, groups[0])
 
         self.speed = 100
         self.collision_obj = player.collision_obj
         self.direction = player.direction
         self.acceleration = pygame.Vector2()
 
-
     def remove(self, groups):
         for group in groups:
             group.remove(self)
             group.remove(self.hp_surface)
-    
 
     def collision_with_player(self):
         if self.rect.colliderect(self.player.rect):
@@ -161,7 +155,7 @@ class Enemy(pygame.sprite.Sprite):
                     if self.direction.y + self.acceleration.y > 0: self.rect.bottom = obj.rect.top
 
     def input(self):
-        if self.player.hp >0:
+        if self.player.hp > 0:
             self.direction.x = self.player.rect.x - self.rect.x
             self.direction.y = self.player.rect.y - self.rect.y
             self.direction = self.direction.normalize() if self.direction else self.direction
