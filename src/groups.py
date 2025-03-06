@@ -21,4 +21,3 @@ class EnemySprites(pygame.sprite.Group):
     def update(self, player, enemies):
         for enemy in enemies:
             enemy.player = player
-

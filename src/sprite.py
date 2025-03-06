@@ -14,7 +14,3 @@ class Collision(pygame.sprite.Sprite):
         self.image = surf
         self.rect = self.image.get_rect(topleft = pos)
         self.type = 'collision'
-
-    def update(self, **kwargs):
-        pass
-
