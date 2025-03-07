@@ -107,6 +107,9 @@ class Sword(pygame.sprite.Sprite):
                 enemy.get_hit(self.damage)
                 enemy.stop()
 
+    
+
+
 
 class EnemyHp(pygame.sprite.Sprite):
     def __init__(self, enemy, groups):

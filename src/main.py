@@ -5,6 +5,7 @@ import player
 import sprite 
 import groups 
 import pygame
+#import pdb; pdb.set_trace()
 
 class Game:
     def __init__(self):
@@ -21,7 +22,9 @@ class Game:
 
         self.setup()
 
-        self.player = player.Player((200, 200), self.all_sprites, self.collision_sprites, self.enemy_sprites)
+        
+
+        
 
     def UI(self):
         self.text_surface = self.font.render(f'HP: {self.player.hp}', 1, 'black')
@@ -34,6 +37,8 @@ class Game:
     def setup(self):
         self.font = pygame.font.Font(None, 30)
         map = load_pygame('maps/map2.tmx')
+        
+        
         for x, y, image in map.get_layer_by_name('Map').tiles():
             sprite.Block((x * TILE_SIZE, y * TILE_SIZE), image, self.all_sprites)
 
@@ -43,6 +48,12 @@ class Game:
         for obj in map.get_layer_by_name('Objects'):
             sprite.Collision((obj.x, obj.y), obj.image, (self.all_sprites, self.collision_sprites))
             #print((obj.x,obj.y), obj.image)
+        self.player = player.Player((200, 200), self.all_sprites, self.collision_sprites, self.enemy_sprites)
+        for i in range(5):
+            player.Enemy((i*200, i*200),(self.all_sprites, self.collision_sprites, self.enemy_sprites), self.player)
+            self.enemy_sprites.update(self.player, self.enemy_sprites)
+        for enemy in self.enemy_sprites:
+            print(enemy.rect)
                 
     def run(self):
         while self.running:
@@ -61,9 +72,15 @@ class Game:
                         self.player.hp = 100
                         print("Respawn")
                         self.enemy_sprites.update(self.player, self.enemy_sprites)
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                    for enemy in self.enemy_sprites:
+                        print(enemy.rect)
             
             #update
             self.all_sprites.update(dt=dt)
+
+            
+            
                     
             #draw
             self.display_surface.fill("white")
