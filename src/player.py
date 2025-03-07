@@ -170,8 +170,8 @@ class Enemy(pygame.sprite.Sprite):
             self.direction.y = 0
 
     def stop(self):
-        self.acceleration.x = -int(self.direction.x * 10)
-        self.acceleration.y = -int(self.direction.y * 10)
+        self.acceleration.x = -int(self.direction.x * 30)
+        self.acceleration.y = -int(self.direction.y * 30)
 
     def acceleration_update(self):
         if self.acceleration.x > 0: self.acceleration.x -= 1

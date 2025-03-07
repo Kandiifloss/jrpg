@@ -48,12 +48,15 @@ class Game:
         for obj in map.get_layer_by_name('Objects'):
             sprite.Collision((obj.x, obj.y), obj.image, (self.all_sprites, self.collision_sprites))
             #print((obj.x,obj.y), obj.image)
-        self.player = player.Player((200, 200), self.all_sprites, self.collision_sprites, self.enemy_sprites)
-        for i in range(5):
-            player.Enemy((randint(0,1000), randint(0, 2000)),(self.all_sprites, self.collision_sprites, self.enemy_sprites), self.player)
+
             
-        for enemy in self.enemy_sprites:
-            print(enemy.rect)
+        self.player = player.Player((200, 200), self.all_sprites, self.collision_sprites, self.enemy_sprites)
+
+        #рандомный спавн 228 337
+        for i in range(50):
+            player.Enemy((randint(60,876), randint(66, 1845)),(self.all_sprites, self.collision_sprites, self.enemy_sprites), self.player)
+            
+
                 
     def run(self):
         while self.running:
@@ -74,7 +77,7 @@ class Game:
                         self.enemy_sprites.update(self.player, self.enemy_sprites)
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     for enemy in self.enemy_sprites:
-                        print(enemy.rect)
+                        print(self.player.rect)
             
             #update
                         
