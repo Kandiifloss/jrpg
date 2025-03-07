@@ -22,22 +22,19 @@ class Game:
 
         self.setup()
 
-        
-
-        
-
-    def UI(self):
+    def UI(self, fps):
         self.text_surface = self.font.render(f'HP: {self.player.hp}', 1, 'black')
         self.text_direction_x = self.font.render(f'DirectX {self.player.direction}', 1, 'black')
         self.text_acc = self.font.render(f'Acc {self.player.acceleration}', 1, 'black')
+        self.text_fps = self.font.render("Fps: "+str(fps),1,'black')
         self.display_surface.blit(self.text_surface, (10, 10))
         self.display_surface.blit(self.text_direction_x, (10, 40))
         self.display_surface.blit(self.text_acc, (10, 70))
+        self.display_surface.blit(self.text_fps, (10, 100))
 
     def setup(self):
         self.font = pygame.font.Font(None, 30)
         map = load_pygame('maps/map2.tmx')
-        
         
         for x, y, image in map.get_layer_by_name('Map').tiles():
             sprite.Block((x * TILE_SIZE, y * TILE_SIZE), image, self.all_sprites)
@@ -47,17 +44,13 @@ class Game:
         
         for obj in map.get_layer_by_name('Objects'):
             sprite.Collision((obj.x, obj.y), obj.image, (self.all_sprites, self.collision_sprites))
-            #print((obj.x,obj.y), obj.image)
-
-            
+  
         self.player = player.Player((200, 200), self.all_sprites, self.collision_sprites, self.enemy_sprites)
 
         #рандомный спавн 228 337
-        for i in range(50):
+        for i in range(10):
             player.Enemy((randint(60,876), randint(66, 1845)),(self.all_sprites, self.collision_sprites, self.enemy_sprites), self.player)
-            
-
-                
+                     
     def run(self):
         while self.running:
             dt = self.clock.tick(60) / 1000
@@ -76,20 +69,15 @@ class Game:
                         print("Respawn")
                         self.enemy_sprites.update(self.player, self.enemy_sprites)
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
-                    for enemy in self.enemy_sprites:
-                        print(self.player.rect)
+                    print(self.player.rect.x, self.player.rect.y)
             
             #update
-                        
             self.all_sprites.update(dt=dt)
-
-            
-            
-                    
+    
             #draw
             self.display_surface.fill("white")
             self.all_sprites.draw(self.player.rect.center)
-            self.UI()
+            self.UI(int(self.clock.get_fps()))
             pygame.display.update()
         pygame.quit()
 

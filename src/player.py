@@ -3,6 +3,8 @@ import sys
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, collision_sprites, enemy_sprites):
+        #Запихиваем сначала мечь в группу спрайтов, так что он первый рисуется. (временное решение, чтобы его не отображать, достаточно не вписывать мечь в all_sprites вовсе)
+        self.sword = Sword((-140, -140), groups, enemy_sprites)
         super().__init__(groups)
         self.image = pygame.image.load('images/stone.png').convert_alpha()
         self.rect = self.image.get_rect(center=pos)
@@ -10,7 +12,7 @@ class Player(pygame.sprite.Sprite):
         self.collision_obj = collision_sprites
         self.type = 'player'
         
-        self.sword = Sword((-140, -140), groups, enemy_sprites)
+        #self.sword = Sword((-140, -140), groups, enemy_sprites)
 
         # cool down
         self.can_hit = True
@@ -20,9 +22,10 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.Vector2()
         self.out_direction = pygame.Vector2()
         self.acceleration = pygame.Vector2()
-        self.speed = 500
+        self.speed = 200
         self.hp = 100
         self.attack = 0
+        self.face = pygame.Vector2()
 
     def kill(self):
         super().kill()
@@ -33,9 +36,12 @@ class Player(pygame.sprite.Sprite):
         self.direction.x = int(keys[pygame.K_d]) - int(keys[pygame.K_a])
         self.direction.y = int(keys[pygame.K_s]) - int(keys[pygame.K_w])
         self.direction = self.direction.normalize() if self.direction else self.direction
-
+        #короче записываем крайний вектор
+        if self.direction != (0,0) and self.face != self.direction:
+            self.face = self.direction 
+        #короче рисуем перед лицом вектор*расстояние
         if keys[pygame.K_f] and self.can_hit:
-            self.sword.hit(self.rect.center)
+            self.sword.hit((self.face.x*50 + self.rect.centerx, self.face.y*50 + self.rect.centery))
             
             self.can_hit = False
             self.hit_time = pygame.time.get_ticks()
@@ -77,8 +83,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = self.hit_box.center
 
     def get_hit(self, enemy):
-        self.acceleration.x  = int(enemy.direction.x * 10)
-        self.acceleration.y = int(enemy.direction.y * 10)
+        self.acceleration.x  = int(enemy.direction.x * 20)
+        self.acceleration.y = int(enemy.direction.y * 20)
         self.rect.center = self.hit_box.center
         self.hp -= enemy.damage
         if self.hp <= 0:
@@ -93,7 +99,7 @@ class Player(pygame.sprite.Sprite):
 class Sword(pygame.sprite.Sprite):
     def __init__(self, pos, groups, enemy_sprites):
         super().__init__(groups)
-        self.image = pygame.Surface((200, 200))
+        self.image = pygame.Surface((100, 100))
         self.rect = self.image.fill('brown')
         self.rect.center = pos
         self.enemy_sprites = enemy_sprites
@@ -129,7 +135,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=pos)
         self.type = 'enemy'
         self.player = player
-        self.max_hp = self.hp = 10
+        self.max_hp = self.hp = 5
         self.damage = 10
         self.hp_surface = EnemyHp(self, groups[0])
 
@@ -170,8 +176,8 @@ class Enemy(pygame.sprite.Sprite):
             self.direction.y = 0
 
     def stop(self):
-        self.acceleration.x = -int(self.direction.x * 30)
-        self.acceleration.y = -int(self.direction.y * 30)
+        self.acceleration.x = -int(self.direction.x * 20)
+        self.acceleration.y = -int(self.direction.y * 20)
 
     def acceleration_update(self):
         if self.acceleration.x > 0: self.acceleration.x -= 1
