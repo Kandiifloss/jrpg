@@ -193,5 +193,5 @@ class Enemy(pygame.sprite.Sprite):
             self.stop()
 
     def update(self, **kwargs):
-        self.move(kwargs['dt'])
         self.input()
+        self.move(kwargs['dt'])

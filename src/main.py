@@ -50,8 +50,8 @@ class Game:
             #print((obj.x,obj.y), obj.image)
         self.player = player.Player((200, 200), self.all_sprites, self.collision_sprites, self.enemy_sprites)
         for i in range(5):
-            player.Enemy((i*200, i*200),(self.all_sprites, self.collision_sprites, self.enemy_sprites), self.player)
-            self.enemy_sprites.update(self.player, self.enemy_sprites)
+            player.Enemy((randint(0,1000), randint(0, 2000)),(self.all_sprites, self.collision_sprites, self.enemy_sprites), self.player)
+            
         for enemy in self.enemy_sprites:
             print(enemy.rect)
                 
@@ -77,6 +77,7 @@ class Game:
                         print(enemy.rect)
             
             #update
+                        
             self.all_sprites.update(dt=dt)
 
             
